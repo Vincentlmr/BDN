@@ -1,0 +1,160 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Mon Jan  8 13:37:23 2024
+
+@author: vlemeur
+"""
+
+------------------------------------------------------------------------------
+mongoDB
+------------------------------------------------------------------------------
+Question1:
+restaurants.aggregate([
+    {
+        "$project": {
+            "_id": 0,
+            "borough":1,
+            "grades.date":1
+        }
+    }
+])
+------------------------------------------------------------------------------
+Question2: Les quartiers où il y a au moins un restaurant qui a au moins 4 scores et où tous ses scores sont inérieurs à 15
+
+db.restaurants.aggregate([
+    {
+        "$unwind": "$grades"
+    },
+    {
+        "$group": {
+            "_id": {
+                "borough": "$borough",
+                "restaurant_id": "$restaurant_id"
+            },
+            "count_scores": {"$sum": 1},
+            "max_score": {"$max": "$grades.score"},
+            "min_score": {"$min": "$grades.score"}
+        }
+    },
+    {
+        "$match": {
+            "count_scores": {"$gte": 4},
+            "max_score": {"$lt": 15},
+            "min_score": {"$lt": 15}
+        }
+    },
+    {
+        "$group": {
+            "_id": "$_id.borough"
+        }
+    },
+    {
+        "$project": {
+            "_id": 0,
+            "borough": "$_id"
+        }
+    }
+])
+------------------------------------------------------------------------------
+Question3: Compte le nombre de restaurants par type de cuisine pour le quartier Queens
+
+restaurants.aggregate([
+    {
+        "$match": {"borough": "Queens"}
+    },
+    {
+        "$group": {
+            "_id": "$cuisine",
+            "count": {"$sum": 1}
+        }
+    },
+    {
+        "$project": {
+            "_id": 0,
+            "cuisine": "$_id",
+            "count": 1
+        }
+    },
+    {
+        "$sort": {"count": 1}
+    }
+])
+
+------------------------------------------------------------------------------
+Question 4:Classement des meilleurs style de cuisine pas moyenne par ordre croissant
+
+restaurants.aggregate([
+
+    {
+        "$unwind": "$grades"
+    },
+    {
+        "$group": {
+            "_id": "$cuisine",
+            "moyenne": {"$avg": "$grades.score"}
+        }
+    },
+    {
+        "$sort": {"moyenne": 1}
+    },
+    {
+        "$project": {
+            "_id": 0,
+            "cuisine": "$_id",
+            "moyenne": 1
+        }
+    }
+])
+
+------------------------------------------------------------------------------
+Question5: Nombre total de grades de score supérieur à 20 par quartier
+
+restaurants.aggregate([
+    {
+        "$unwind": "$grades"
+    },
+    {
+        "$match": {
+            "grades.score": {"$gt": 20}
+        }
+    },
+    {
+        "$group": {
+            "_id": "$borough",
+            "total_grades_gt_20": {"$sum": 1}
+        }
+    },
+    {
+        "$project": {
+            "_id": 0,
+            "borough": "$_id",
+            "total_grades_gt_20": 1
+        }
+    }
+])
+------------------------------------------------------------------------------
+Question6:
+restaurants.aggregate([
+    {
+        "$match": {
+            "restaurant_id": "40356649"
+        }
+    },{
+       "$unwind":"$grades"},
+      {
+       "$sort":{
+           "gardes.score":1}
+       }
+
+
+])
+------------------------------------------------------------------------------
+OrientDB
+------------------------------------------------------------------------------
+Question 1:
+MATCH {Class : Profiles, as: profile, where: (Name="Sally")}-IsFromCountry->{Class : Countries, where: (Name="Colombia")} return profile.Surname  
+
+------------------------------------------------------------------------------
+Question 2:
+MATCH {Class : Profiles}-HasFriend->{Class : Profiles}-HasVisited->{Class : Theatres, where: (Name="Teatro Dell'Opera")}-HasVisited->{Class : Castles, where: (Name="Forte Ceraino")}return Profiles.Name
