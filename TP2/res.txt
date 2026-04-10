@@ -1,0 +1,135 @@
+TP2
+
+1. var r1=db.restaurants.aggregate([{$match:{}}]).toArray();
+    -> printjson (r1);
+
+2. var r2=db.restaurants.aggregate( [
+   {
+     $count: "nb"
+   }
+] ).toArray()
+
+3. var r3=db.restaurants.aggregate( [
+   { 
+    $project : {
+        name:1,cuisine:1, _id:0
+        }
+    }]).toArray()
+    
+4. var r4=db.restaurants.aggregate( [
+   { 
+    $sort : {borough:1,name:1}
+    }]).toArray()
+    
+5. var r5=db.restaurants.aggregate( [
+   { 
+    $match : {borough: 'Brooklyn' },
+    },
+    {
+     $count: "nb"
+    }
+    ]).toArray()
+    
+6. var r6=db.restaurants.aggregate( [
+   { 
+    $match : {borough: 'Brooklyn', cuisine: 'Italian' },
+    },
+    {
+     $count: "nb"
+    }
+    ]).toArray()
+    
+7. var r7=db.restaurants.aggregate( [
+   { 
+    $match : {borough: 'Brooklyn', cuisine: 'Italian' ,'address.street': '5 Avenue'},
+    },
+    {
+     $count: "nb"
+    }
+    ]).toArray()
+    
+8. var r8=db.restaurants.aggregate( [
+   { 
+    $match : {borough: 'Brooklyn', cuisine: 'Italian' ,'address.street': '5 Avenue', name: /pizza/i },
+    },
+    {
+     $count: "nb"
+    }
+    ]).toArray()
+    
+9. var r9=db.restaurants.aggregate( [
+   { 
+    $match :{borough: 'Bronx', 'grades.score': {$lt: 10}}
+    },
+    {
+     $count: "nb"
+    }
+    ]).toArray()
+
+10. var r10=db.restaurants.aggregate( [
+   { 
+    $match :{borough: 'Bronx', 'grades.score': {$not: {$gte:10}}}
+    },
+    {
+     $count: "nb"
+    }
+    ]).toArray()
+
+11. var r11=db.restaurants.aggregate( [
+   { 
+    $match :{borough: 'Bronx', 'grades.score': {$not: {$gte:10}}}
+    },
+    {
+    $project : {name:1, grades:1}
+    },
+    {
+     $count: "nb"
+    }
+    ]).toArray()
+
+12. var r12=db.restaurants.aggregate( [
+   { 
+    $match :{grades: {$elemMatch: {grade: 'C', score: {$lt: 30}}}}
+    },
+    {
+     $count: "nb"
+    }
+    ]).toArray()
+
+13. var r13=db.restaurants.aggregate([
+    {
+        $group: { _id: '$borough'}
+    }
+    ]).toArray()
+
+14. var r14=db.restaurants.aggregate([
+    {
+        $group: { _id: '$borough'}
+    },
+    {
+     $count: "nb"
+    }
+    ]).toArray()
+    
+15. var r15=db.restaurants.aggregate([
+    {
+        $unwind: '$grades'
+    },
+    {
+        $group: { _id: '$grades.grade'}
+    },
+    {
+     $count: "nb"
+    }
+    ]).toArray()
+    
+16.
+
+17. var r17=db.restaurants.aggregate([
+    {
+        $match: {'address.coord': { $geoWithin: {$centerSphere: [ [-73.93414657, 40.82302903], 1/6378.1 ] }}}
+    },
+    {
+     $count: "nb"
+    }
+    ]).toArray()
